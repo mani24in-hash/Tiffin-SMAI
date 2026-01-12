@@ -12,22 +12,12 @@
     border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1);
   }
 
-  /* Header with logo + title */
-  .header { text-align: center; margin-bottom: 25px; }
-  .header img {
-    max-width: 140px; width: 100%; height: auto;
-    margin-bottom: 10px;
-  }
+  /* Header (NO logo) */
+  .header { text-align: center; margin-bottom: 18px; }
   .header h1 { margin: 0; color: #b45309; }
-  .header h1 span {
-    display: block; font-size: 20px; font-weight: normal; margin-top: 6px;
-  }
-  .logo-error {
-    display: none;
-    color: #b91c1c;
-    font-size: 13px;
-    margin-bottom: 8px;
-  }
+  .header h1 span { display: block; font-size: 20px; font-weight: normal; margin-top: 6px; }
+  .subtitle { margin-top: 10px; font-size: 14px; color: #444; }
+  .divider { margin: 18px auto 0; max-width: 520px; border: none; border-top: 1px solid #eee; }
 
   .section-title {
     margin-top: 25px; color: #92400e;
@@ -131,26 +121,18 @@
 <body>
 <div class="container">
 
-  <!-- Logo + Title -->
+  <!-- Title (two lines), subtitle, divider -->
   <div class="header">
-    <!-- IMPORTANT:
-         Upload your logo file to the SAME folder as index.html in GitHub
-         and name it EXACTLY: sanatan-mandir-atlanta-logo.jpg
-    -->
-    <img
-      src="./sanatan-mandir-atlanta-logo.jpg"
-      alt="Sanatan Mandir Atlanta Logo"
-      onerror="this.style.display='none'; document.getElementById('logoError').style.display='block';"
-    />
-    <div id="logoError" class="logo-error">
-      Logo not found. Please upload <b>sanatan-mandir-atlanta-logo.jpg</b> in the same folder as <b>index.html</b>.
-      (Check the file extension: .jpg vs .jpeg)
-    </div>
-
     <h1>
       Sanatan Mandir Atlanta Inc.
       <span>Tiffin Order Form</span>
     </h1>
+
+    <div class="subtitle">
+      Pickup Address: 1281 Cooper Lake Road SE, Smyrna, GA 30082
+    </div>
+
+    <hr class="divider">
   </div>
 
   <form id="orderForm" action="https://formspree.io/f/xeeeqjrn" method="POST">
@@ -369,9 +351,9 @@ We have received your order successfully.
 
   <!-- QR Code + Display Name (AUTO uses current page URL) -->
   <div class="qr-wrap">
-    <img id="qrImg" width="220" height="220" alt="SMAI Tiffin Order Form QR Code">
+    <img id="qrImg" width="220" height="220" alt="Tiffin Order Form QR Code">
     <div>
-      <a class="qr-link" id="qrLink" target="_blank">SMAI Tiffin Order Form</a>
+      <a class="qr-link" id="qrLink" target="_blank">Tiffin Order Form</a>
     </div>
     <div class="qr-url">QR opens: <span id="qrUrlText"></span></div>
   </div>
