@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Sanatan Mandir Tiffin Service Order</title>
 
 <style>
   body { font-family: Arial, sans-serif; background: #f6f6f6; padding: 20px; }
   .container {
-    max-width: 900px; background: #fff; margin: auto; padding: 25px;
+    max-width: 980px; background: #fff; margin: auto; padding: 25px;
     border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1);
   }
-  h1 { text-align: center; color: #b45309; }
+  h1 { text-align: center; color: #b45309; margin-top: 0; }
   .section-title {
     margin-top: 25px; color: #92400e;
     border-bottom: 1px solid #ddd; padding-bottom: 6px;
@@ -33,152 +33,361 @@
     display: none; margin-top: 18px; padding: 14px;
     border: 1px solid #eee; border-radius: 8px;
   }
-  .menu-item { font-weight: normal; margin-left: 10px; margin-top: 8px; }
+
+  .items-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+  }
+  .items-table th, .items-table td {
+    border-bottom: 1px solid #eee;
+    padding: 10px 8px;
+    vertical-align: middle;
+  }
+  .items-table th {
+    text-align: left;
+    color: #444;
+    font-size: 14px;
+  }
+  .qty {
+    width: 90px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+  }
+  .price {
+    white-space: nowrap;
+    color: #111;
+    font-weight: bold;
+  }
 
   .total-box {
-    margin-top: 20px; padding: 14px;
+    margin-top: 18px; padding: 14px;
     border: 1px solid #ddd; border-radius: 10px;
     background: #fafafa; display: flex;
     justify-content: space-between; align-items: center;
   }
   .total-amount { font-size: 22px; font-weight: bold; color: #065f46; }
 
+  .error {
+    display: none;
+    margin-top: 12px;
+    padding: 10px;
+    border-radius: 6px;
+    background: #fff7ed;
+    border: 1px solid #fed7aa;
+    color: #9a3412;
+  }
+
   button {
-    margin-top: 25px; width: 100%; padding: 12px;
+    margin-top: 22px; width: 100%; padding: 12px;
     background: #b45309; color: #fff;
     border: none; font-size: 16px; cursor: pointer;
     border-radius: 6px;
   }
   button:hover { background: #92400e; }
+
+  .hint { font-size: 13px; color: #555; margin-top: 6px; }
 </style>
 </head>
 
 <body>
 <div class="container">
-<h1>Sanatan Mandir Tiffin Service Order</h1>
+  <h1>Sanatan Mandir Tiffin Service Order</h1>
 
-<form id="orderForm" action="https://formspree.io/f/xeeeqjrn" method="POST">
+  <form id="orderForm" action="https://formspree.io/f/xeeeqjrn" method="POST">
 
-  <!-- CUSTOMER DETAILS -->
-  <label>Full Name *</label>
-  <input type="text" name="name" required>
+    <!-- CUSTOMER DETAILS -->
+    <label>Full Name *</label>
+    <input type="text" name="name" required>
 
-  <label>Phone *</label>
-  <input type="tel" name="phone" required>
+    <label>Phone *</label>
+    <input type="tel" name="phone" required>
 
-  <label>Email *</label>
-  <input type="email" name="email" required>
+    <label>Email *</label>
+    <input type="email" name="email" required>
 
-  <label>Pickup Time *</label>
-  <input type="time" name="pickup_time" required>
+    <label>Pickup Time *</label>
+    <input type="time" name="pickup_time" required>
 
-  <!-- DAY SELECTION -->
-  <h2 class="section-title">Select Day(s)</h2>
-  <div class="day-picker">
-    <label class="day-pill"><input type="checkbox" data-day="Monday"> Monday</label>
-    <label class="day-pill"><input type="checkbox" data-day="Tuesday"> Tuesday</label>
-    <label class="day-pill"><input type="checkbox" data-day="Wednesday"> Wednesday</label>
-    <label class="day-pill"><input type="checkbox" data-day="Thursday"> Thursday</label>
-    <label class="day-pill"><input type="checkbox" data-day="Friday"> Friday</label>
-  </div>
+    <!-- DAY SELECTION -->
+    <h2 class="section-title">Select Day(s) *</h2>
+    <div class="hint">Select one or more days. Enter quantities for items on those days.</div>
 
-  <!-- TOTAL -->
-  <div class="total-box">
-    <div>Total Amount</div>
-    <div class="total-amount" id="totalDisplay">$0.00</div>
-  </div>
-  <input type="hidden" name="total_amount" id="totalAmount" value="0.00">
+    <div class="day-picker">
+      <label class="day-pill"><input type="checkbox" data-day="Monday" name="selected_days[]" value="Monday"> Monday</label>
+      <label class="day-pill"><input type="checkbox" data-day="Tuesday" name="selected_days[]" value="Tuesday"> Tuesday</label>
+      <label class="day-pill"><input type="checkbox" data-day="Wednesday" name="selected_days[]" value="Wednesday"> Wednesday</label>
+      <label class="day-pill"><input type="checkbox" data-day="Thursday" name="selected_days[]" value="Thursday"> Thursday</label>
+      <label class="day-pill"><input type="checkbox" data-day="Friday" name="selected_days[]" value="Friday"> Friday</label>
+    </div>
 
-  <!-- MONDAY -->
-  <div class="day-menu" id="menu-Monday">
-    <h2 class="section-title">Monday Menu</h2>
-    <label class="menu-item"><input type="checkbox" class="priced" data-price="10"> Full Tiffin ($10)</label>
-    <label class="menu-item"><input type="checkbox" class="priced" data-price="7"> Bhaji (per lb) $7</label>
-    <label class="menu-item"><input type="checkbox" class="priced" data-price="7"> Tava Pulav (per lb) $7</label>
-  </div>
+    <div id="dayError" class="error">Please select at least one day.</div>
+    <div id="qtyError" class="error">Please enter quantity (greater than 0) for at least one item.</div>
 
-  <!-- TUESDAY -->
-  <div class="day-menu" id="menu-Tuesday">
-    <h2 class="section-title">Tuesday Menu</h2>
-    <label class="menu-item"><input type="checkbox" class="priced" data-price="10"> Full Tiffin ($10)</label>
-    <label class="menu-item"><input type="checkbox" class="priced" data-price="7"> Chole $7</label>
-    <label class="menu-item"><input type="checkbox" class="priced" data-price="0.5"> Puri $0.50</label>
-  </div>
+    <!-- TOTAL -->
+    <div class="total-box" aria-live="polite">
+      <div><strong>Total Amount</strong></div>
+      <div class="total-amount" id="totalDisplay">$0.00</div>
+    </div>
+    <input type="hidden" name="total_amount" id="totalAmount" value="0.00">
 
-  <!-- WEDNESDAY -->
-  <div class="day-menu" id="menu-Wednesday">
-    <h2 class="section-title">Wednesday Menu</h2>
-    <label class="menu-item"><input type="checkbox" class="priced" data-price="10"> Full Tiffin ($10)</label>
-    <label class="menu-item"><input type="checkbox" class="priced" data-price="7"> Tadka Dal $7</label>
-    <label class="menu-item"><input type="checkbox" class="priced" data-price="7"> Potato Shaak $7</label>
-    <label class="menu-item"><input type="checkbox" class="priced" data-price="1"> Paratha $1</label>
-  </div>
+    <!-- MONDAY -->
+    <div class="day-menu" id="menu-Monday">
+      <h2 class="section-title" style="margin-top:0;">Monday</h2>
+      <table class="items-table">
+        <thead>
+          <tr><th>Item</th><th class="price">Unit Price</th><th>Qty</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Full Tiffin – Pav Bhaji, Tava Pulav &amp; Raita</td>
+            <td class="price">$10.00</td>
+            <td><input class="qty" type="number" min="0" step="1" value="0"
+                       name="Monday_Full_Tiffin_qty" data-price="10"></td>
+          </tr>
+          <tr>
+            <td>Bhaji (per lb)</td>
+            <td class="price">$7.00</td>
+            <td><input class="qty" type="number" min="0" step="1" value="0"
+                       name="Monday_Bhaji_qty" data-price="7"></td>
+          </tr>
+          <tr>
+            <td>Tava Pulav (per lb)</td>
+            <td class="price">$7.00</td>
+            <td><input class="qty" type="number" min="0" step="1" value="0"
+                       name="Monday_Tava_Pulav_qty" data-price="7"></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
-  <!-- THURSDAY -->
-  <div class="day-menu" id="menu-Thursday">
-    <h2 class="section-title">Thursday Menu</h2>
-    <label class="menu-item"><input type="checkbox" class="priced" data-price="10"> Full Tiffin ($10)</label>
-    <label class="menu-item"><input type="checkbox" class="priced" data-price="7"> Daal Dhokli $7</label>
-    <label class="menu-item"><input type="checkbox" class="priced" data-price="1"> Masala Bhakri $1</label>
-  </div>
+    <!-- TUESDAY -->
+    <div class="day-menu" id="menu-Tuesday">
+      <h2 class="section-title" style="margin-top:0;">Tuesday</h2>
+      <table class="items-table">
+        <thead>
+          <tr><th>Item</th><th class="price">Unit Price</th><th>Qty</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Full Tiffin – Chole, Puri, Kheer &amp; Jeera Rice</td>
+            <td class="price">$10.00</td>
+            <td><input class="qty" type="number" min="0" step="1" value="0"
+                       name="Tuesday_Full_Tiffin_qty" data-price="10"></td>
+          </tr>
+          <tr>
+            <td>Chole</td>
+            <td class="price">$7.00</td>
+            <td><input class="qty" type="number" min="0" step="1" value="0"
+                       name="Tuesday_Chole_qty" data-price="7"></td>
+          </tr>
+          <tr>
+            <td>Puri (per piece)</td>
+            <td class="price">$0.50</td>
+            <td><input class="qty" type="number" min="0" step="1" value="0"
+                       name="Tuesday_Puri_qty" data-price="0.5"></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
-  <!-- FRIDAY -->
-  <div class="day-menu" id="menu-Friday">
-    <h2 class="section-title">Friday Menu</h2>
-    <label class="menu-item"><input type="checkbox" class="priced" data-price="10"> Full Tiffin ($10)</label>
-    <label class="menu-item"><input type="checkbox" class="priced" data-price="7"> Sambhar $7</label>
-    <label class="menu-item"><input type="checkbox" class="priced" data-price="1"> Idli $1</label>
-  </div>
+    <!-- WEDNESDAY -->
+    <div class="day-menu" id="menu-Wednesday">
+      <h2 class="section-title" style="margin-top:0;">Wednesday</h2>
+      <table class="items-table">
+        <thead>
+          <tr><th>Item</th><th class="price">Unit Price</th><th>Qty</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Full Tiffin – Tadka Dal, Cabbage, Potato Shaak, Paratha &amp; Jeera Rice</td>
+            <td class="price">$10.00</td>
+            <td><input class="qty" type="number" min="0" step="1" value="0"
+                       name="Wednesday_Full_Tiffin_qty" data-price="10"></td>
+          </tr>
+          <tr>
+            <td>Tadka Dal (per lb)</td>
+            <td class="price">$7.00</td>
+            <td><input class="qty" type="number" min="0" step="1" value="0"
+                       name="Wednesday_Tadka_Dal_qty" data-price="7"></td>
+          </tr>
+          <tr>
+            <td>Potato Shaak (per lb)</td>
+            <td class="price">$7.00</td>
+            <td><input class="qty" type="number" min="0" step="1" value="0"
+                       name="Wednesday_Potato_Shaak_qty" data-price="7"></td>
+          </tr>
+          <tr>
+            <td>Paratha (per piece)</td>
+            <td class="price">$1.00</td>
+            <td><input class="qty" type="number" min="0" step="1" value="0"
+                       name="Wednesday_Paratha_qty" data-price="1"></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
-  <!-- NOTES -->
-  <h2 class="section-title">Additional Notes</h2>
-  <textarea name="notes" rows="4"></textarea>
+    <!-- THURSDAY -->
+    <div class="day-menu" id="menu-Thursday">
+      <h2 class="section-title" style="margin-top:0;">Thursday</h2>
+      <table class="items-table">
+        <thead>
+          <tr><th>Item</th><th class="price">Unit Price</th><th>Qty</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Full Tiffin – Daal Dhokli, Sambharo, Masala Bhakri &amp; Rice</td>
+            <td class="price">$10.00</td>
+            <td><input class="qty" type="number" min="0" step="1" value="0"
+                       name="Thursday_Full_Tiffin_qty" data-price="10"></td>
+          </tr>
+          <tr>
+            <td>Daal Dhokli</td>
+            <td class="price">$7.00</td>
+            <td><input class="qty" type="number" min="0" step="1" value="0"
+                       name="Thursday_Daal_Dhokli_qty" data-price="7"></td>
+          </tr>
+          <tr>
+            <td>Masala Bhakri (per piece)</td>
+            <td class="price">$1.00</td>
+            <td><input class="qty" type="number" min="0" step="1" value="0"
+                       name="Thursday_Masala_Bhakri_qty" data-price="1"></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
-  <!-- AUTO CONFIRMATION EMAIL -->
-  <input type="hidden" name="_autoresponse"
-    value="Thank you for your Sanatan Mandir Tiffin Service order!
+    <!-- FRIDAY -->
+    <div class="day-menu" id="menu-Friday">
+      <h2 class="section-title" style="margin-top:0;">Friday</h2>
+      <table class="items-table">
+        <thead>
+          <tr><th>Item</th><th class="price">Unit Price</th><th>Qty</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Full Tiffin – Idli, Sambhar &amp; Coconut Chutney</td>
+            <td class="price">$10.00</td>
+            <td><input class="qty" type="number" min="0" step="1" value="0"
+                       name="Friday_Full_Tiffin_qty" data-price="10"></td>
+          </tr>
+          <tr>
+            <td>Sambhar</td>
+            <td class="price">$7.00</td>
+            <td><input class="qty" type="number" min="0" step="1" value="0"
+                       name="Friday_Sambhar_qty" data-price="7"></td>
+          </tr>
+          <tr>
+            <td>Idli (per piece)</td>
+            <td class="price">$1.00</td>
+            <td><input class="qty" type="number" min="0" step="1" value="0"
+                       name="Friday_Idli_qty" data-price="1"></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- NOTES -->
+    <h2 class="section-title">Additional Notes</h2>
+    <textarea name="notes" rows="4" placeholder="Any special instructions..."></textarea>
+
+    <!-- AUTO CONFIRMATION EMAIL -->
+    <input type="hidden" name="_autoresponse"
+      value="Thank you for your Sanatan Mandir Tiffin Service order!
 
 We have received your order successfully.
+
 Pickup Time: {{pickup_time}}
 
 🙏 Sanatan Mandir Tiffin Service">
 
-  <button type="submit">Submit Order</button>
-</form>
+    <button type="submit">Submit Order</button>
+  </form>
 </div>
 
 <script>
+  const form = document.getElementById('orderForm');
   const dayCheckboxes = document.querySelectorAll('[data-day]');
-  const pricedItems = document.querySelectorAll('.priced');
   const totalDisplay = document.getElementById('totalDisplay');
   const totalAmount = document.getElementById('totalAmount');
 
-  function updateMenus() {
-    dayCheckboxes.forEach(cb => {
-      const menu = document.getElementById('menu-' + cb.dataset.day);
-      if (cb.checked) {
-        menu.style.display = 'block';
-      } else {
-        menu.style.display = 'none';
-        menu.querySelectorAll('input').forEach(i => i.checked = false);
-      }
-    });
-    calculateTotal();
-  }
+  const dayError = document.getElementById('dayError');
+  const qtyError = document.getElementById('qtyError');
 
   function calculateTotal() {
     let total = 0;
-    pricedItems.forEach(i => {
-      if (i.checked && i.closest('.day-menu').style.display !== 'none') {
-        total += parseFloat(i.dataset.price);
+
+    document.querySelectorAll('.day-menu').forEach(menu => {
+      if (menu.style.display !== 'none') {
+        menu.querySelectorAll('input.qty').forEach(qtyInput => {
+          const qty = parseInt(qtyInput.value || "0", 10);
+          const price = parseFloat(qtyInput.dataset.price || "0");
+          if (!Number.isNaN(qty) && qty > 0 && !Number.isNaN(price)) {
+            total += qty * price;
+          }
+        });
       }
     });
+
     totalDisplay.textContent = `$${total.toFixed(2)}`;
     totalAmount.value = total.toFixed(2);
+    return total;
   }
 
+  function updateMenus() {
+    dayCheckboxes.forEach(cb => {
+      const day = cb.dataset.day;
+      const menu = document.getElementById('menu-' + day);
+
+      if (cb.checked) {
+        menu.style.display = 'block';
+      } else {
+        // Hide & reset quantities for unselected day
+        menu.style.display = 'none';
+        menu.querySelectorAll('input.qty').forEach(i => i.value = 0);
+      }
+    });
+
+    dayError.style.display = 'none';
+    qtyError.style.display = 'none';
+    calculateTotal();
+  }
+
+  // When day selection changes, show/hide menus
   dayCheckboxes.forEach(cb => cb.addEventListener('change', updateMenus));
-  pricedItems.forEach(i => i.addEventListener('change', calculateTotal));
+
+  // Recalculate total when any quantity changes (event delegation)
+  document.addEventListener('input', (e) => {
+    if (e.target && e.target.classList && e.target.classList.contains('qty')) {
+      // Prevent negative values
+      if (parseInt(e.target.value || "0", 10) < 0) e.target.value = 0;
+      calculateTotal();
+    }
+  });
+
+  // Validate: at least 1 day selected AND at least 1 item qty > 0
+  form.addEventListener('submit', (e) => {
+    const anyDaySelected = Array.from(dayCheckboxes).some(cb => cb.checked);
+    if (!anyDaySelected) {
+      e.preventDefault();
+      dayError.style.display = 'block';
+      dayError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+
+    const total = calculateTotal();
+    if (total <= 0) {
+      e.preventDefault();
+      qtyError.style.display = 'block';
+      qtyError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+  });
+
+  // Initial state
+  updateMenus();
 </script>
 
 </body>
