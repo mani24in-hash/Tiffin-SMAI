@@ -226,8 +226,14 @@
     <div id="dayError" class="error">Please select at least one day of the week.</div>
     <div id="qtyError" class="error">Please enter quantity (greater than 0) for at least one item.</div>
 
+    <!-- TOTAL (updated with payment note) -->
     <div class="total-box" aria-live="polite">
-      <div><strong>Total Amount</strong></div>
+      <div>
+        <strong>Total Amount</strong>
+        <div style="font-size:13px; color:#374151; margin-top:4px;">
+          To be paid at temple during pick up
+        </div>
+      </div>
       <div class="total-amount" id="totalDisplay">$0.00</div>
     </div>
 
@@ -402,8 +408,14 @@
 
     <div class="receipt-items" id="rItems"></div>
 
+    <!-- RECEIPT TOTAL (updated with payment note) -->
     <div class="receipt-total">
-      <div><b>Total</b></div>
+      <div>
+        <b>Total</b>
+        <div style="font-size:13px; color:#374151; margin-top:4px;">
+          To be paid at temple during pick up
+        </div>
+      </div>
       <div><b id="rTotal">$0.00</b></div>
     </div>
 
@@ -508,24 +520,21 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function buildReceiptPreview() {
-    // Show receipt once they start interacting (any day checked OR any qty > 0)
-    const selectedDays = dayCheckboxes.filter(cb => cb.checked).map(cb => cb.dataset.day);
     const allQtyInputs = Array.from(document.querySelectorAll('input.qty-input'));
     const anyQty = allQtyInputs.some(i => parseInt(i.value || "0", 10) > 0);
+    const anyDay = dayCheckboxes.some(cb => cb.checked);
 
-    if (!selectedDays.length && !anyQty) {
+    if (!anyDay && !anyQty) {
       receiptWrap.style.display = 'none';
       return;
     }
     receiptWrap.style.display = 'block';
 
-    // Header fields
     rName.textContent = (nameInput.value || "").trim() || "-";
     rPhone.textContent = (phoneInput.value || "").trim() || "-";
     rEmail.textContent = (emailInput.value || "").trim() || "-";
     rPickupTime.textContent = (pickupTimeInput.value || "").trim() || "-";
 
-    // Items grouped by day
     const byDay = {};
     allQtyInputs.forEach(inp => {
       const qty = sanitizeQty(inp);
@@ -537,7 +546,6 @@ document.addEventListener('DOMContentLoaded', () => {
       byDay[day].push({ item, qty, price });
     });
 
-    // Render
     let html = "";
     const daysInOrder = ["Monday","Tuesday","Wednesday","Thursday","Friday"];
     daysInOrder.forEach(day => {
@@ -550,7 +558,6 @@ document.addEventListener('DOMContentLoaded', () => {
       html += `</ul>`;
     });
 
-    // Notes
     const notes = (notesInput.value || "").trim();
     if (notes) {
       html += `<h4>Notes</h4><div style="font-size:14px; color:#111827;">${escapeHtml(notes)}</div>`;
@@ -570,7 +577,6 @@ document.addEventListener('DOMContentLoaded', () => {
       .replaceAll("'","&#039;");
   }
 
-  // Listeners
   dayCheckboxes.forEach(cb => cb.addEventListener('change', updateMenus));
 
   document.addEventListener('input', (e) => {
@@ -584,13 +590,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Print receipt only
   document.getElementById('printBtn').addEventListener('click', () => {
     buildReceiptPreview();
     window.print();
   });
 
-  // Validation on submit (same as before)
   form.addEventListener('submit', (e) => {
     const anyDaySelected = dayCheckboxes.some(cb => cb.checked);
     if (!anyDaySelected) {
@@ -608,7 +612,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Initial
   updateMenus();
 });
 </script>
