@@ -57,20 +57,11 @@
     background: #fff;
   }
 
-  .items-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 10px;
-  }
-  .items-table th, .items-table td {
-    border-bottom: 1px solid #eee;
-    padding: 10px 8px;
-    vertical-align: middle;
-  }
+  .items-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+  .items-table th, .items-table td { border-bottom: 1px solid #eee; padding: 10px 8px; vertical-align: middle; }
   .items-table th { text-align: left; color: #444; font-size: 14px; }
   .price { font-weight: bold; white-space: nowrap; }
 
-  /* Dropdown qty style */
   .qty-select {
     width: 110px;
     padding: 8px;
@@ -98,6 +89,21 @@
     color: #9a3412;
   }
 
+  .status {
+    display: none;
+    margin-top: 12px;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid #d1fae5;
+    background: #ecfdf5;
+    color: #065f46;
+  }
+  .status.error {
+    border-color: #fecaca;
+    background: #fef2f2;
+    color: #991b1b;
+  }
+
   .btn-row { display:flex; gap:12px; margin-top: 16px; flex-wrap: wrap; }
   button, .secondary-btn {
     width: 100%;
@@ -111,10 +117,10 @@
   button:hover { background: #92400e; }
   .secondary-btn {
     background: #111827; color:#fff; text-decoration:none; text-align:center;
+    display: none; /* hidden until submit success */
   }
   .secondary-btn:hover { background:#0b1220; }
 
-  /* Confirmation box */
   .receipt-wrap {
     display: none;
     margin-top: 26px;
@@ -145,7 +151,6 @@
   }
   .receipt-total b { font-size: 18px; color:#065f46; }
 
-  /* QR */
   .qr-wrap {
     text-align: center;
     margin-top: 26px;
@@ -165,12 +170,10 @@
     color: #b45309;
   }
 
-  /* Print only confirmation */
   @media print {
     body { background: #fff; padding: 0; }
     .container > *:not(.receipt-wrap) { display: none !important; }
     .receipt-wrap { display: block !important; border: none; padding: 0; }
-    .print-hide { display: none !important; }
   }
 </style>
 </head>
@@ -225,7 +228,6 @@
     <div id="dayError" class="error">Please select at least one day of the week.</div>
     <div id="qtyError" class="error">Please select quantity (greater than 0) for at least one item.</div>
 
-    <!-- TOTAL with payment note -->
     <div class="total-box" aria-live="polite">
       <div>
         <strong>Total Amount</strong>
@@ -238,7 +240,10 @@
 
     <h2 class="section-title">Menu</h2>
 
-    <!-- Helper: dropdown options 0-20 (copied into each select) -->
+    <!-- ====== MENUS (dropdown qty) ====== -->
+    <!-- To keep this message readable, menu HTML is identical to your last dropdown version.
+         If you want, I can also refactor to generate the dropdown options with JS to shorten. -->
+
     <!-- MONDAY -->
     <div class="day-menu" id="menu-Monday">
       <h3 style="margin:0; color:#92400e;">Monday</h3>
@@ -500,10 +505,12 @@
     <h2 class="section-title">Additional Notes</h2>
     <textarea name="notes" id="notesInput" rows="4" placeholder="Any special instructions..."></textarea>
 
-    <div class="btn-row print-hide">
-      <button type="submit">Submit Order</button>
+    <div class="btn-row">
+      <button type="submit" id="submitBtn">Submit Order</button>
       <a class="secondary-btn" href="javascript:void(0)" id="printBtn">Print Order Confirmation</a>
     </div>
+
+    <div id="statusBox" class="status" role="status"></div>
   </form>
 
   <!-- Order Confirmation Preview -->
@@ -535,7 +542,7 @@
     </div>
   </div>
 
-  <!-- QR Code (no "QR opens..." line) -->
+  <!-- QR Code -->
   <div class="qr-wrap">
     <img id="qrImg" width="220" height="220" alt="Tiffin Order Form QR Code">
     <div>
@@ -554,6 +561,10 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('qrLink').href = destinationUrl;
 
   const form = document.getElementById('orderForm');
+  const submitBtn = document.getElementById('submitBtn');
+  const printBtn = document.getElementById('printBtn');
+  const statusBox = document.getElementById('statusBox');
+
   const dayCheckboxes = Array.from(document.querySelectorAll('input[type="checkbox"][data-day]'));
   const totalDisplay = document.getElementById('totalDisplay');
   const totalAmount = document.getElementById('totalAmount');
@@ -661,7 +672,6 @@ document.addEventListener('DOMContentLoaded', () => {
         selected.push(day);
       } else {
         menu.style.display = 'none';
-        // reset qty for hidden day
         menu.querySelectorAll('select.qty-select').forEach(s => s.value = "0");
       }
     });
@@ -680,6 +690,7 @@ document.addEventListener('DOMContentLoaded', () => {
     buildConfirmationPreview();
   }
 
+  // events
   dayCheckboxes.forEach(cb => cb.addEventListener('change', updateMenus));
 
   document.addEventListener('change', (e) => {
@@ -695,30 +706,83 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  document.getElementById('printBtn').addEventListener('click', () => {
+  printBtn.addEventListener('click', () => {
     buildConfirmationPreview();
     receiptWrap.style.display = 'block';
     window.print();
   });
 
-  form.addEventListener('submit', (e) => {
+  // Submit via AJAX so we can show Print only AFTER success
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    // Validate
     const anyDaySelected = dayCheckboxes.some(cb => cb.checked);
     if (!anyDaySelected) {
-      e.preventDefault();
       dayError.style.display = 'block';
       dayError.scrollIntoView({ behavior: 'smooth', block: 'center' });
       return;
     }
-
     const total = calculateTotal();
     if (total <= 0) {
-      e.preventDefault();
       qtyError.style.display = 'block';
       qtyError.scrollIntoView({ behavior: 'smooth', block: 'center' });
       return;
     }
+
+    // Prepare confirmation preview before sending
+    buildConfirmationPreview();
+
+    // Disable submit
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Submitting...";
+    statusBox.style.display = "none";
+    statusBox.classList.remove("error");
+
+    try {
+      const formData = new FormData(form);
+
+      const response = await fetch(form.action, {
+        method: "POST",
+        body: formData,
+        headers: { "Accept": "application/json" }
+      });
+
+      if (response.ok) {
+        statusBox.textContent = "Order submitted successfully. You can now print your order confirmation.";
+        statusBox.style.display = "block";
+        statusBox.classList.remove("error");
+
+        // Show print button only after success
+        printBtn.style.display = "block";
+
+        // Optional: keep submit disabled to prevent duplicates
+        submitBtn.style.display = "none";
+
+        // Scroll to confirmation
+        receiptWrap.style.display = "block";
+        receiptWrap.scrollIntoView({ behavior: "smooth", block: "start" });
+      } else {
+        let msg = "Submission failed. Please try again.";
+        try {
+          const data = await response.json();
+          if (data && data.errors && data.errors.length) {
+            msg = data.errors.map(x => x.message).join(" ");
+          }
+        } catch {}
+        throw new Error(msg);
+      }
+    } catch (err) {
+      statusBox.textContent = err.message || "Submission failed. Please try again.";
+      statusBox.style.display = "block";
+      statusBox.classList.add("error");
+
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Submit Order";
+    }
   });
 
+  // init
   updateMenus();
 });
 </script>
