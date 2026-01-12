@@ -1,276 +1,185 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sanatan Mandir Tiffin Service Order</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sanatan Mandir Tiffin Service Order</title>
 
-  <style>
-    body { font-family: Arial, sans-serif; background: #f6f6f6; padding: 20px; }
-    .container {
-      max-width: 900px; background: #fff; margin: auto; padding: 25px;
-      border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-    h1 { text-align: center; color: #b45309; margin-top: 0; }
-    .section-title { margin-top: 25px; color: #92400e; border-bottom: 1px solid #ddd; padding-bottom: 6px; }
-    label { display: block; margin-top: 12px; font-weight: bold; }
-    input[type="text"], input[type="email"], input[type="tel"], textarea {
-      width: 100%; padding: 10px; margin-top: 6px; border: 1px solid #ccc; border-radius: 4px;
-      font-size: 14px;
-    }
+<style>
+  body { font-family: Arial, sans-serif; background: #f6f6f6; padding: 20px; }
+  .container {
+    max-width: 900px; background: #fff; margin: auto; padding: 25px;
+    border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  }
+  h1 { text-align: center; color: #b45309; }
+  .section-title {
+    margin-top: 25px; color: #92400e;
+    border-bottom: 1px solid #ddd; padding-bottom: 6px;
+  }
+  label { display: block; margin-top: 12px; font-weight: bold; }
+  input[type="text"], input[type="email"], input[type="tel"], input[type="time"], textarea {
+    width: 100%; padding: 10px; margin-top: 6px;
+    border: 1px solid #ccc; border-radius: 4px;
+  }
 
-    .day-picker {
-      display: flex; flex-wrap: wrap; gap: 12px; margin-top: 8px;
-      padding: 10px; border: 1px solid #ddd; border-radius: 6px; background: #fafafa;
-    }
-    .day-pill { font-weight: normal; margin: 0; }
-    .day-pill input { transform: translateY(1px); }
+  .day-picker {
+    display: flex; flex-wrap: wrap; gap: 12px;
+    margin-top: 8px; padding: 10px;
+    border: 1px solid #ddd; border-radius: 6px; background: #fafafa;
+  }
+  .day-pill { font-weight: normal; }
 
-    .day-menu {
-      display: none;
-      margin-top: 18px; padding: 14px; border: 1px solid #eee; border-radius: 8px; background: #fff;
-    }
-    .menu-item { font-weight: normal; margin-left: 10px; margin-top: 8px; }
+  .day-menu {
+    display: none; margin-top: 18px; padding: 14px;
+    border: 1px solid #eee; border-radius: 8px;
+  }
+  .menu-item { font-weight: normal; margin-left: 10px; margin-top: 8px; }
 
-    .hint { font-size: 13px; color: #555; margin-top: 6px; }
-    .error {
-      display: none; margin-top: 12px; padding: 10px; border-radius: 6px;
-      background: #fff7ed; border: 1px solid #fed7aa; color: #9a3412;
-    }
+  .total-box {
+    margin-top: 20px; padding: 14px;
+    border: 1px solid #ddd; border-radius: 10px;
+    background: #fafafa; display: flex;
+    justify-content: space-between; align-items: center;
+  }
+  .total-amount { font-size: 22px; font-weight: bold; color: #065f46; }
 
-    .total-box{
-      margin-top: 18px;
-      padding: 14px;
-      border: 1px solid #ddd;
-      border-radius: 10px;
-      background: #fafafa;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      font-size: 18px;
-    }
-    .total-label { color: #111; font-weight: bold; }
-    .total-amount { color: #065f46; font-weight: bold; font-size: 22px; }
-
-    button {
-      margin-top: 20px; width: 100%; padding: 12px; background: #b45309;
-      color: white; border: none; font-size: 16px; cursor: pointer; border-radius: 6px;
-    }
-    button:hover { background: #92400e; }
-    .required-note { font-size: 13px; color: #666; text-align: center; margin-top: 12px; }
-  </style>
+  button {
+    margin-top: 25px; width: 100%; padding: 12px;
+    background: #b45309; color: #fff;
+    border: none; font-size: 16px; cursor: pointer;
+    border-radius: 6px;
+  }
+  button:hover { background: #92400e; }
+</style>
 </head>
 
 <body>
-  <div class="container">
-    <h1>Sanatan Mandir Tiffin Service Order</h1>
+<div class="container">
+<h1>Sanatan Mandir Tiffin Service Order</h1>
 
-    <form id="orderForm" action="https://formspree.io/f/xeeeqjrn" method="POST">
-      <label>Full Name *</label>
-      <input type="text" name="name" required>
+<form id="orderForm" action="https://formspree.io/f/xeeeqjrn" method="POST">
 
-      <label>Phone *</label>
-      <input type="tel" name="phone" required>
+  <!-- CUSTOMER DETAILS -->
+  <label>Full Name *</label>
+  <input type="text" name="name" required>
 
-      <label>Email *</label>
-      <input type="email" name="email" required>
+  <label>Phone *</label>
+  <input type="tel" name="phone" required>
 
-      <h2 class="section-title">Select Day(s) *</h2>
-      <div class="hint">Choose one or more days. Only selected day menus will appear.</div>
+  <label>Email *</label>
+  <input type="email" name="email" required>
 
-      <div class="day-picker" role="group" aria-label="Select days">
-        <label class="day-pill"><input type="checkbox" name="selected_days[]" value="Monday" data-day="Monday"> Monday</label>
-        <label class="day-pill"><input type="checkbox" name="selected_days[]" value="Tuesday" data-day="Tuesday"> Tuesday</label>
-        <label class="day-pill"><input type="checkbox" name="selected_days[]" value="Wednesday" data-day="Wednesday"> Wednesday</label>
-        <label class="day-pill"><input type="checkbox" name="selected_days[]" value="Thursday" data-day="Thursday"> Thursday</label>
-        <label class="day-pill"><input type="checkbox" name="selected_days[]" value="Friday" data-day="Friday"> Friday</label>
-      </div>
+  <label>Pickup Time *</label>
+  <input type="time" name="pickup_time" required>
 
-      <div id="dayError" class="error">Please select at least one day.</div>
-
-      <!-- LIVE TOTAL -->
-      <div class="total-box" aria-live="polite">
-        <div class="total-label">Total Amount</div>
-        <div class="total-amount" id="totalDisplay">$0.00</div>
-      </div>
-
-      <!-- Hidden field sent to Formspree -->
-      <input type="hidden" name="total_amount" id="totalAmount" value="0.00">
-
-      <!-- MONDAY MENU -->
-      <div class="day-menu" id="menu-Monday">
-        <h2 class="section-title" style="margin-top: 0;">Monday Menu</h2>
-
-        <label class="menu-item">
-          <input type="checkbox" class="priced-item" data-price="10" name="Monday_items[]" value="Full Tiffin - Pav Bhaji, Tava Pulav & Raita ($10)">
-          Full Tiffin – Pav Bhaji, Tava Pulav & Raita ($10)
-        </label>
-        <label class="menu-item">
-          <input type="checkbox" class="priced-item" data-price="7" name="Monday_items[]" value="Bhaji (per lb) - $7">
-          Bhaji (per lb) – $7
-        </label>
-        <label class="menu-item">
-          <input type="checkbox" class="priced-item" data-price="7" name="Monday_items[]" value="Tava Pulav (per lb) - $7">
-          Tava Pulav (per lb) – $7
-        </label>
-      </div>
-
-      <!-- TUESDAY MENU -->
-      <div class="day-menu" id="menu-Tuesday">
-        <h2 class="section-title" style="margin-top: 0;">Tuesday Menu</h2>
-
-        <label class="menu-item">
-          <input type="checkbox" class="priced-item" data-price="10" name="Tuesday_items[]" value="Full Tiffin - Chole, Puri, Kheer & Jeera Rice ($10)">
-          Full Tiffin – Chole, Puri, Kheer & Jeera Rice ($10)
-        </label>
-        <label class="menu-item">
-          <input type="checkbox" class="priced-item" data-price="7" name="Tuesday_items[]" value="Chole - $7">
-          Chole – $7
-        </label>
-        <label class="menu-item">
-          <input type="checkbox" class="priced-item" data-price="0.5" name="Tuesday_items[]" value="Puri (per piece) - $0.50">
-          Puri (per piece) – $0.50
-        </label>
-      </div>
-
-      <!-- WEDNESDAY MENU -->
-      <div class="day-menu" id="menu-Wednesday">
-        <h2 class="section-title" style="margin-top: 0;">Wednesday Menu</h2>
-
-        <label class="menu-item">
-          <input type="checkbox" class="priced-item" data-price="10" name="Wednesday_items[]" value="Full Tiffin - Tadka Dal, Cabbage, Potato Shaak, Paratha & Jeera Rice ($10)">
-          Full Tiffin – Tadka Dal, Cabbage, Potato Shaak, Paratha & Jeera Rice ($10)
-        </label>
-        <label class="menu-item">
-          <input type="checkbox" class="priced-item" data-price="7" name="Wednesday_items[]" value="Tadka Dal (per lb) - $7">
-          Tadka Dal (per lb) – $7
-        </label>
-        <label class="menu-item">
-          <input type="checkbox" class="priced-item" data-price="7" name="Wednesday_items[]" value="Potato Shaak (per lb) - $7">
-          Potato Shaak (per lb) – $7
-        </label>
-        <label class="menu-item">
-          <input type="checkbox" class="priced-item" data-price="1" name="Wednesday_items[]" value="Paratha (per piece) - $1">
-          Paratha (per piece) – $1
-        </label>
-      </div>
-
-      <!-- THURSDAY MENU -->
-      <div class="day-menu" id="menu-Thursday">
-        <h2 class="section-title" style="margin-top: 0;">Thursday Menu</h2>
-
-        <label class="menu-item">
-          <input type="checkbox" class="priced-item" data-price="10" name="Thursday_items[]" value="Full Tiffin - Daal Dhokli, Sambharo, Masala Bhakri & Rice ($10)">
-          Full Tiffin – Daal Dhokli, Sambharo, Masala Bhakri & Rice ($10)
-        </label>
-        <label class="menu-item">
-          <input type="checkbox" class="priced-item" data-price="7" name="Thursday_items[]" value="Daal Dhokli - $7">
-          Daal Dhokli – $7
-        </label>
-        <label class="menu-item">
-          <input type="checkbox" class="priced-item" data-price="1" name="Thursday_items[]" value="Masala Bhakri (per piece) - $1">
-          Masala Bhakri (per piece) – $1
-        </label>
-      </div>
-
-      <!-- FRIDAY MENU -->
-      <div class="day-menu" id="menu-Friday">
-        <h2 class="section-title" style="margin-top: 0;">Friday Menu</h2>
-
-        <label class="menu-item">
-          <input type="checkbox" class="priced-item" data-price="10" name="Friday_items[]" value="Full Tiffin - Idli, Sambhar & Coconut Chutney ($10)">
-          Full Tiffin – Idli, Sambhar & Coconut Chutney ($10)
-        </label>
-        <label class="menu-item">
-          <input type="checkbox" class="priced-item" data-price="7" name="Friday_items[]" value="Sambhar - $7">
-          Sambhar – $7
-        </label>
-        <label class="menu-item">
-          <input type="checkbox" class="priced-item" data-price="1" name="Friday_items[]" value="Idli (per piece) - $1">
-          Idli (per piece) – $1
-        </label>
-      </div>
-
-      <h2 class="section-title">Additional Notes</h2>
-      <textarea name="notes" rows="4" placeholder="Any special instructions..."></textarea>
-
-      <button type="submit">Submit Order</button>
-      <div class="required-note">Fields marked * are required.</div>
-    </form>
+  <!-- DAY SELECTION -->
+  <h2 class="section-title">Select Day(s)</h2>
+  <div class="day-picker">
+    <label class="day-pill"><input type="checkbox" data-day="Monday"> Monday</label>
+    <label class="day-pill"><input type="checkbox" data-day="Tuesday"> Tuesday</label>
+    <label class="day-pill"><input type="checkbox" data-day="Wednesday"> Wednesday</label>
+    <label class="day-pill"><input type="checkbox" data-day="Thursday"> Thursday</label>
+    <label class="day-pill"><input type="checkbox" data-day="Friday"> Friday</label>
   </div>
 
-  <script>
-    const dayCheckboxes = document.querySelectorAll('input[type="checkbox"][data-day]');
-    const dayError = document.getElementById('dayError');
-    const form = document.getElementById('orderForm');
+  <!-- TOTAL -->
+  <div class="total-box">
+    <div>Total Amount</div>
+    <div class="total-amount" id="totalDisplay">$0.00</div>
+  </div>
+  <input type="hidden" name="total_amount" id="totalAmount" value="0.00">
 
-    const totalDisplay = document.getElementById('totalDisplay');
-    const totalAmountField = document.getElementById('totalAmount');
+  <!-- MONDAY -->
+  <div class="day-menu" id="menu-Monday">
+    <h2 class="section-title">Monday Menu</h2>
+    <label class="menu-item"><input type="checkbox" class="priced" data-price="10"> Full Tiffin ($10)</label>
+    <label class="menu-item"><input type="checkbox" class="priced" data-price="7"> Bhaji (per lb) $7</label>
+    <label class="menu-item"><input type="checkbox" class="priced" data-price="7"> Tava Pulav (per lb) $7</label>
+  </div>
 
-    function recalcTotal() {
-      let total = 0;
+  <!-- TUESDAY -->
+  <div class="day-menu" id="menu-Tuesday">
+    <h2 class="section-title">Tuesday Menu</h2>
+    <label class="menu-item"><input type="checkbox" class="priced" data-price="10"> Full Tiffin ($10)</label>
+    <label class="menu-item"><input type="checkbox" class="priced" data-price="7"> Chole $7</label>
+    <label class="menu-item"><input type="checkbox" class="priced" data-price="0.5"> Puri $0.50</label>
+  </div>
 
-      // Only count checked priced items that are currently visible (selected days)
-      document.querySelectorAll('.day-menu').forEach(menu => {
-        if (menu.style.display !== 'none') {
-          menu.querySelectorAll('input.priced-item:checked').forEach(cb => {
-            const p = parseFloat(cb.dataset.price || "0");
-            if (!Number.isNaN(p)) total += p;
-          });
-        }
-      });
+  <!-- WEDNESDAY -->
+  <div class="day-menu" id="menu-Wednesday">
+    <h2 class="section-title">Wednesday Menu</h2>
+    <label class="menu-item"><input type="checkbox" class="priced" data-price="10"> Full Tiffin ($10)</label>
+    <label class="menu-item"><input type="checkbox" class="priced" data-price="7"> Tadka Dal $7</label>
+    <label class="menu-item"><input type="checkbox" class="priced" data-price="7"> Potato Shaak $7</label>
+    <label class="menu-item"><input type="checkbox" class="priced" data-price="1"> Paratha $1</label>
+  </div>
 
-      totalDisplay.textContent = `$${total.toFixed(2)}`;
-      totalAmountField.value = total.toFixed(2);
-    }
+  <!-- THURSDAY -->
+  <div class="day-menu" id="menu-Thursday">
+    <h2 class="section-title">Thursday Menu</h2>
+    <label class="menu-item"><input type="checkbox" class="priced" data-price="10"> Full Tiffin ($10)</label>
+    <label class="menu-item"><input type="checkbox" class="priced" data-price="7"> Daal Dhokli $7</label>
+    <label class="menu-item"><input type="checkbox" class="priced" data-price="1"> Masala Bhakri $1</label>
+  </div>
 
-    function updateMenus() {
-      const selectedDays = [];
+  <!-- FRIDAY -->
+  <div class="day-menu" id="menu-Friday">
+    <h2 class="section-title">Friday Menu</h2>
+    <label class="menu-item"><input type="checkbox" class="priced" data-price="10"> Full Tiffin ($10)</label>
+    <label class="menu-item"><input type="checkbox" class="priced" data-price="7"> Sambhar $7</label>
+    <label class="menu-item"><input type="checkbox" class="priced" data-price="1"> Idli $1</label>
+  </div>
 
-      dayCheckboxes.forEach(cb => {
-        const day = cb.getAttribute('data-day');
-        const menu = document.getElementById('menu-' + day);
+  <!-- NOTES -->
+  <h2 class="section-title">Additional Notes</h2>
+  <textarea name="notes" rows="4"></textarea>
 
-        if (cb.checked) {
-          selectedDays.push(day);
-          menu.style.display = 'block';
-        } else {
-          // Hide menu + clear items inside it
-          menu.style.display = 'none';
-          menu.querySelectorAll('input[type="checkbox"]').forEach(itemCb => itemCb.checked = false);
-        }
-      });
+  <!-- AUTO CONFIRMATION EMAIL -->
+  <input type="hidden" name="_autoresponse"
+    value="Thank you for your Sanatan Mandir Tiffin Service order!
 
-      if (selectedDays.length > 0) dayError.style.display = 'none';
-      recalcTotal();
-    }
+We have received your order successfully.
+Pickup Time: {{pickup_time}}
 
-    // Day selection listener
-    dayCheckboxes.forEach(cb => cb.addEventListener('change', updateMenus));
+🙏 Sanatan Mandir Tiffin Service">
 
-    // Item selection listener (event delegation)
-    document.addEventListener('change', (e) => {
-      if (e.target && e.target.classList && e.target.classList.contains('priced-item')) {
-        recalcTotal();
+  <button type="submit">Submit Order</button>
+</form>
+</div>
+
+<script>
+  const dayCheckboxes = document.querySelectorAll('[data-day]');
+  const pricedItems = document.querySelectorAll('.priced');
+  const totalDisplay = document.getElementById('totalDisplay');
+  const totalAmount = document.getElementById('totalAmount');
+
+  function updateMenus() {
+    dayCheckboxes.forEach(cb => {
+      const menu = document.getElementById('menu-' + cb.dataset.day);
+      if (cb.checked) {
+        menu.style.display = 'block';
+      } else {
+        menu.style.display = 'none';
+        menu.querySelectorAll('input').forEach(i => i.checked = false);
       }
     });
+    calculateTotal();
+  }
 
-    // Prevent submit if no days selected
-    form.addEventListener('submit', function (e) {
-      const anyDaySelected = Array.from(dayCheckboxes).some(cb => cb.checked);
-      if (!anyDaySelected) {
-        e.preventDefault();
-        dayError.style.display = 'block';
-        dayError.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        return;
+  function calculateTotal() {
+    let total = 0;
+    pricedItems.forEach(i => {
+      if (i.checked && i.closest('.day-menu').style.display !== 'none') {
+        total += parseFloat(i.dataset.price);
       }
-      // final ensure total is correct
-      recalcTotal();
     });
+    totalDisplay.textContent = `$${total.toFixed(2)}`;
+    totalAmount.value = total.toFixed(2);
+  }
 
-    // Initial render
-    updateMenus();
-  </script>
+  dayCheckboxes.forEach(cb => cb.addEventListener('change', updateMenus));
+  pricedItems.forEach(i => i.addEventListener('change', calculateTotal));
+</script>
+
 </body>
 </html>
