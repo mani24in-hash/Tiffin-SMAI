@@ -70,9 +70,14 @@
   .items-table th { text-align: left; color: #444; font-size: 14px; }
   .price { font-weight: bold; white-space: nowrap; }
 
-  .qty-input {
-    width: 90px; padding: 8px;
-    border: 1px solid #ccc; border-radius: 8px; font-size: 14px;
+  /* Dropdown qty style */
+  .qty-select {
+    width: 110px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 14px;
+    background: #fff;
   }
 
   .total-box {
@@ -109,7 +114,7 @@
   }
   .secondary-btn:hover { background:#0b1220; }
 
-  /* Receipt box */
+  /* Confirmation box */
   .receipt-wrap {
     display: none;
     margin-top: 26px;
@@ -140,7 +145,7 @@
   }
   .receipt-total b { font-size: 18px; color:#065f46; }
 
-  /* QR section */
+  /* QR */
   .qr-wrap {
     text-align: center;
     margin-top: 26px;
@@ -160,7 +165,7 @@
     color: #b45309;
   }
 
-  /* Print only receipt */
+  /* Print only confirmation */
   @media print {
     body { background: #fff; padding: 0; }
     .container > *:not(.receipt-wrap) { display: none !important; }
@@ -204,7 +209,7 @@
 
     <h2 class="section-title">Select Day(s) of the Week *</h2>
     <div class="hint">
-      Choose one or more days. Only those menu(s) will appear. Enter quantity (0 = not selected).
+      Choose one or more days. Only those menu(s) will appear. Select quantity from the dropdown (0 = not selected).
     </div>
 
     <div class="day-picker">
@@ -218,7 +223,7 @@
     <div id="selectedDaysBox" class="selected-days"></div>
 
     <div id="dayError" class="error">Please select at least one day of the week.</div>
-    <div id="qtyError" class="error">Please enter quantity (greater than 0) for at least one item.</div>
+    <div id="qtyError" class="error">Please select quantity (greater than 0) for at least one item.</div>
 
     <!-- TOTAL with payment note -->
     <div class="total-box" aria-live="polite">
@@ -233,6 +238,7 @@
 
     <h2 class="section-title">Menu</h2>
 
+    <!-- Helper: dropdown options 0-20 (copied into each select) -->
     <!-- MONDAY -->
     <div class="day-menu" id="menu-Monday">
       <h3 style="margin:0; color:#92400e;">Monday</h3>
@@ -242,20 +248,41 @@
           <tr>
             <td>Full Tiffin – Pav Bhaji, Tava Pulav &amp; Raita</td>
             <td class="price">$10.00</td>
-            <td><input class="qty-input" type="number" min="0" step="1" value="0"
-              name="Monday_Full_Tiffin_qty" data-day="Monday" data-item="Full Tiffin – Pav Bhaji, Tava Pulav & Raita" data-price="10"></td>
+            <td>
+              <select class="qty-select" name="Monday_Full_Tiffin_qty" data-day="Monday"
+                data-item="Full Tiffin – Pav Bhaji, Tava Pulav & Raita" data-price="10">
+                <option value="0" selected>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
+                <option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option>
+                <option>12</option><option>13</option><option>14</option><option>15</option><option>16</option><option>17</option>
+                <option>18</option><option>19</option><option>20</option>
+              </select>
+            </td>
           </tr>
           <tr>
             <td>Bhaji (per lb)</td>
             <td class="price">$7.00</td>
-            <td><input class="qty-input" type="number" min="0" step="1" value="0"
-              name="Monday_Bhaji_qty" data-day="Monday" data-item="Bhaji (per lb)" data-price="7"></td>
+            <td>
+              <select class="qty-select" name="Monday_Bhaji_qty" data-day="Monday"
+                data-item="Bhaji (per lb)" data-price="7">
+                <option value="0" selected>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
+                <option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option>
+                <option>12</option><option>13</option><option>14</option><option>15</option><option>16</option><option>17</option>
+                <option>18</option><option>19</option><option>20</option>
+              </select>
+            </td>
           </tr>
           <tr>
             <td>Tava Pulav (per lb)</td>
             <td class="price">$7.00</td>
-            <td><input class="qty-input" type="number" min="0" step="1" value="0"
-              name="Monday_Tava_Pulav_qty" data-day="Monday" data-item="Tava Pulav (per lb)" data-price="7"></td>
+            <td>
+              <select class="qty-select" name="Monday_Tava_Pulav_qty" data-day="Monday"
+                data-item="Tava Pulav (per lb)" data-price="7">
+                <option value="0" selected>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
+                <option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option>
+                <option>12</option><option>13</option><option>14</option><option>15</option><option>16</option><option>17</option>
+                <option>18</option><option>19</option><option>20</option>
+              </select>
+            </td>
           </tr>
         </tbody>
       </table>
@@ -270,20 +297,41 @@
           <tr>
             <td>Full Tiffin – Chole, Puri, Kheer &amp; Jeera Rice</td>
             <td class="price">$10.00</td>
-            <td><input class="qty-input" type="number" min="0" step="1" value="0"
-              name="Tuesday_Full_Tiffin_qty" data-day="Tuesday" data-item="Full Tiffin – Chole, Puri, Kheer & Jeera Rice" data-price="10"></td>
+            <td>
+              <select class="qty-select" name="Tuesday_Full_Tiffin_qty" data-day="Tuesday"
+                data-item="Full Tiffin – Chole, Puri, Kheer & Jeera Rice" data-price="10">
+                <option value="0" selected>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
+                <option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option>
+                <option>12</option><option>13</option><option>14</option><option>15</option><option>16</option><option>17</option>
+                <option>18</option><option>19</option><option>20</option>
+              </select>
+            </td>
           </tr>
           <tr>
             <td>Chole</td>
             <td class="price">$7.00</td>
-            <td><input class="qty-input" type="number" min="0" step="1" value="0"
-              name="Tuesday_Chole_qty" data-day="Tuesday" data-item="Chole" data-price="7"></td>
+            <td>
+              <select class="qty-select" name="Tuesday_Chole_qty" data-day="Tuesday"
+                data-item="Chole" data-price="7">
+                <option value="0" selected>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
+                <option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option>
+                <option>12</option><option>13</option><option>14</option><option>15</option><option>16</option><option>17</option>
+                <option>18</option><option>19</option><option>20</option>
+              </select>
+            </td>
           </tr>
           <tr>
             <td>Puri (per piece)</td>
             <td class="price">$0.50</td>
-            <td><input class="qty-input" type="number" min="0" step="1" value="0"
-              name="Tuesday_Puri_qty" data-day="Tuesday" data-item="Puri (per piece)" data-price="0.5"></td>
+            <td>
+              <select class="qty-select" name="Tuesday_Puri_qty" data-day="Tuesday"
+                data-item="Puri (per piece)" data-price="0.5">
+                <option value="0" selected>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
+                <option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option>
+                <option>12</option><option>13</option><option>14</option><option>15</option><option>16</option><option>17</option>
+                <option>18</option><option>19</option><option>20</option>
+              </select>
+            </td>
           </tr>
         </tbody>
       </table>
@@ -298,26 +346,54 @@
           <tr>
             <td>Full Tiffin – Tadka Dal, Cabbage, Potato Shaak, Paratha &amp; Jeera Rice</td>
             <td class="price">$10.00</td>
-            <td><input class="qty-input" type="number" min="0" step="1" value="0"
-              name="Wednesday_Full_Tiffin_qty" data-day="Wednesday" data-item="Full Tiffin – Tadka Dal, Cabbage, Potato Shaak, Paratha & Jeera Rice" data-price="10"></td>
+            <td>
+              <select class="qty-select" name="Wednesday_Full_Tiffin_qty" data-day="Wednesday"
+                data-item="Full Tiffin – Tadka Dal, Cabbage, Potato Shaak, Paratha & Jeera Rice" data-price="10">
+                <option value="0" selected>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
+                <option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option>
+                <option>12</option><option>13</option><option>14</option><option>15</option><option>16</option><option>17</option>
+                <option>18</option><option>19</option><option>20</option>
+              </select>
+            </td>
           </tr>
           <tr>
             <td>Tadka Dal (per lb)</td>
             <td class="price">$7.00</td>
-            <td><input class="qty-input" type="number" min="0" step="1" value="0"
-              name="Wednesday_Tadka_Dal_qty" data-day="Wednesday" data-item="Tadka Dal (per lb)" data-price="7"></td>
+            <td>
+              <select class="qty-select" name="Wednesday_Tadka_Dal_qty" data-day="Wednesday"
+                data-item="Tadka Dal (per lb)" data-price="7">
+                <option value="0" selected>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
+                <option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option>
+                <option>12</option><option>13</option><option>14</option><option>15</option><option>16</option><option>17</option>
+                <option>18</option><option>19</option><option>20</option>
+              </select>
+            </td>
           </tr>
           <tr>
             <td>Potato Shaak (per lb)</td>
             <td class="price">$7.00</td>
-            <td><input class="qty-input" type="number" min="0" step="1" value="0"
-              name="Wednesday_Potato_Shaak_qty" data-day="Wednesday" data-item="Potato Shaak (per lb)" data-price="7"></td>
+            <td>
+              <select class="qty-select" name="Wednesday_Potato_Shaak_qty" data-day="Wednesday"
+                data-item="Potato Shaak (per lb)" data-price="7">
+                <option value="0" selected>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
+                <option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option>
+                <option>12</option><option>13</option><option>14</option><option>15</option><option>16</option><option>17</option>
+                <option>18</option><option>19</option><option>20</option>
+              </select>
+            </td>
           </tr>
           <tr>
             <td>Paratha (per piece)</td>
             <td class="price">$1.00</td>
-            <td><input class="qty-input" type="number" min="0" step="1" value="0"
-              name="Wednesday_Paratha_qty" data-day="Wednesday" data-item="Paratha (per piece)" data-price="1"></td>
+            <td>
+              <select class="qty-select" name="Wednesday_Paratha_qty" data-day="Wednesday"
+                data-item="Paratha (per piece)" data-price="1">
+                <option value="0" selected>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
+                <option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option>
+                <option>12</option><option>13</option><option>14</option><option>15</option><option>16</option><option>17</option>
+                <option>18</option><option>19</option><option>20</option>
+              </select>
+            </td>
           </tr>
         </tbody>
       </table>
@@ -332,20 +408,41 @@
           <tr>
             <td>Full Tiffin – Daal Dhokli, Sambharo, Masala Bhakri &amp; Rice</td>
             <td class="price">$10.00</td>
-            <td><input class="qty-input" type="number" min="0" step="1" value="0"
-              name="Thursday_Full_Tiffin_qty" data-day="Thursday" data-item="Full Tiffin – Daal Dhokli, Sambharo, Masala Bhakri & Rice" data-price="10"></td>
+            <td>
+              <select class="qty-select" name="Thursday_Full_Tiffin_qty" data-day="Thursday"
+                data-item="Full Tiffin – Daal Dhokli, Sambharo, Masala Bhakri & Rice" data-price="10">
+                <option value="0" selected>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
+                <option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option>
+                <option>12</option><option>13</option><option>14</option><option>15</option><option>16</option><option>17</option>
+                <option>18</option><option>19</option><option>20</option>
+              </select>
+            </td>
           </tr>
           <tr>
             <td>Daal Dhokli</td>
             <td class="price">$7.00</td>
-            <td><input class="qty-input" type="number" min="0" step="1" value="0"
-              name="Thursday_Daal_Dhokli_qty" data-day="Thursday" data-item="Daal Dhokli" data-price="7"></td>
+            <td>
+              <select class="qty-select" name="Thursday_Daal_Dhokli_qty" data-day="Thursday"
+                data-item="Daal Dhokli" data-price="7">
+                <option value="0" selected>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
+                <option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option>
+                <option>12</option><option>13</option><option>14</option><option>15</option><option>16</option><option>17</option>
+                <option>18</option><option>19</option><option>20</option>
+              </select>
+            </td>
           </tr>
           <tr>
             <td>Masala Bhakri (per piece)</td>
             <td class="price">$1.00</td>
-            <td><input class="qty-input" type="number" min="0" step="1" value="0"
-              name="Thursday_Masala_Bhakri_qty" data-day="Thursday" data-item="Masala Bhakri (per piece)" data-price="1"></td>
+            <td>
+              <select class="qty-select" name="Thursday_Masala_Bhakri_qty" data-day="Thursday"
+                data-item="Masala Bhakri (per piece)" data-price="1">
+                <option value="0" selected>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
+                <option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option>
+                <option>12</option><option>13</option><option>14</option><option>15</option><option>16</option><option>17</option>
+                <option>18</option><option>19</option><option>20</option>
+              </select>
+            </td>
           </tr>
         </tbody>
       </table>
@@ -360,20 +457,41 @@
           <tr>
             <td>Full Tiffin – Idli, Sambhar &amp; Coconut Chutney</td>
             <td class="price">$10.00</td>
-            <td><input class="qty-input" type="number" min="0" step="1" value="0"
-              name="Friday_Full_Tiffin_qty" data-day="Friday" data-item="Full Tiffin – Idli, Sambhar & Coconut Chutney" data-price="10"></td>
+            <td>
+              <select class="qty-select" name="Friday_Full_Tiffin_qty" data-day="Friday"
+                data-item="Full Tiffin – Idli, Sambhar & Coconut Chutney" data-price="10">
+                <option value="0" selected>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
+                <option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option>
+                <option>12</option><option>13</option><option>14</option><option>15</option><option>16</option><option>17</option>
+                <option>18</option><option>19</option><option>20</option>
+              </select>
+            </td>
           </tr>
           <tr>
             <td>Sambhar</td>
             <td class="price">$7.00</td>
-            <td><input class="qty-input" type="number" min="0" step="1" value="0"
-              name="Friday_Sambhar_qty" data-day="Friday" data-item="Sambhar" data-price="7"></td>
+            <td>
+              <select class="qty-select" name="Friday_Sambhar_qty" data-day="Friday"
+                data-item="Sambhar" data-price="7">
+                <option value="0" selected>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
+                <option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option>
+                <option>12</option><option>13</option><option>14</option><option>15</option><option>16</option><option>17</option>
+                <option>18</option><option>19</option><option>20</option>
+              </select>
+            </td>
           </tr>
           <tr>
             <td>Idli (per piece)</td>
             <td class="price">$1.00</td>
-            <td><input class="qty-input" type="number" min="0" step="1" value="0"
-              name="Friday_Idli_qty" data-day="Friday" data-item="Idli (per piece)" data-price="1"></td>
+            <td>
+              <select class="qty-select" name="Friday_Idli_qty" data-day="Friday"
+                data-item="Idli (per piece)" data-price="1">
+                <option value="0" selected>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
+                <option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option>
+                <option>12</option><option>13</option><option>14</option><option>15</option><option>16</option><option>17</option>
+                <option>18</option><option>19</option><option>20</option>
+              </select>
+            </td>
           </tr>
         </tbody>
       </table>
@@ -417,7 +535,7 @@
     </div>
   </div>
 
-  <!-- QR Code (NO "QR opens..." line) -->
+  <!-- QR Code (no "QR opens..." line) -->
   <div class="qr-wrap">
     <img id="qrImg" width="220" height="220" alt="Tiffin Order Form QR Code">
     <div>
@@ -429,7 +547,7 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-  // QR (no QR opens text)
+  // QR
   const destinationUrl = window.location.href;
   document.getElementById('qrImg').src =
     'https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=' + encodeURIComponent(destinationUrl);
@@ -457,20 +575,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const rItems = document.getElementById('rItems');
   const rTotal = document.getElementById('rTotal');
 
-  function sanitizeQty(input) {
-    let v = parseInt(input.value || "0", 10);
-    if (Number.isNaN(v) || v < 0) v = 0;
-    input.value = v;
-    return v;
-  }
-
   function calculateTotal() {
     let total = 0;
     document.querySelectorAll('.day-menu').forEach(menu => {
       if (menu.style.display !== 'none') {
-        menu.querySelectorAll('input.qty-input').forEach(qtyInput => {
-          const qty = sanitizeQty(qtyInput);
-          const price = parseFloat(qtyInput.dataset.price || "0");
+        menu.querySelectorAll('select.qty-select').forEach(sel => {
+          const qty = parseInt(sel.value || "0", 10) || 0;
+          const price = parseFloat(sel.dataset.price || "0");
           if (qty > 0 && !Number.isNaN(price)) total += qty * price;
         });
       }
@@ -490,8 +601,8 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function buildConfirmationPreview() {
-    const allQtyInputs = Array.from(document.querySelectorAll('input.qty-input'));
-    const anyQty = allQtyInputs.some(i => parseInt(i.value || "0", 10) > 0);
+    const allQtySelects = Array.from(document.querySelectorAll('select.qty-select'));
+    const anyQty = allQtySelects.some(s => (parseInt(s.value || "0", 10) || 0) > 0);
     const anyDay = dayCheckboxes.some(cb => cb.checked);
 
     if (!anyDay && !anyQty) {
@@ -506,12 +617,12 @@ document.addEventListener('DOMContentLoaded', () => {
     rPickupTime.textContent = (pickupTimeInput.value || "").trim() || "-";
 
     const byDay = {};
-    allQtyInputs.forEach(inp => {
-      const qty = sanitizeQty(inp);
+    allQtySelects.forEach(sel => {
+      const qty = parseInt(sel.value || "0", 10) || 0;
       if (qty <= 0) return;
-      const day = inp.dataset.day || "Other";
-      const item = inp.dataset.item || "Item";
-      const price = parseFloat(inp.dataset.price || "0");
+      const day = sel.dataset.day || "Other";
+      const item = sel.dataset.item || "Item";
+      const price = parseFloat(sel.dataset.price || "0");
       if (!byDay[day]) byDay[day] = [];
       byDay[day].push({ item, qty, price });
     });
@@ -550,7 +661,8 @@ document.addEventListener('DOMContentLoaded', () => {
         selected.push(day);
       } else {
         menu.style.display = 'none';
-        menu.querySelectorAll('input.qty-input').forEach(i => i.value = 0);
+        // reset qty for hidden day
+        menu.querySelectorAll('select.qty-select').forEach(s => s.value = "0");
       }
     });
 
@@ -570,12 +682,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
   dayCheckboxes.forEach(cb => cb.addEventListener('change', updateMenus));
 
-  document.addEventListener('input', (e) => {
-    if (e.target && e.target.classList && e.target.classList.contains('qty-input')) {
-      sanitizeQty(e.target);
+  document.addEventListener('change', (e) => {
+    if (e.target && e.target.classList && e.target.classList.contains('qty-select')) {
       calculateTotal();
       buildConfirmationPreview();
     }
+  });
+
+  document.addEventListener('input', (e) => {
     if (e.target === nameInput || e.target === phoneInput || e.target === emailInput || e.target === pickupTimeInput || e.target === notesInput) {
       buildConfirmationPreview();
     }
@@ -595,6 +709,7 @@ document.addEventListener('DOMContentLoaded', () => {
       dayError.scrollIntoView({ behavior: 'smooth', block: 'center' });
       return;
     }
+
     const total = calculateTotal();
     if (total <= 0) {
       e.preventDefault();
