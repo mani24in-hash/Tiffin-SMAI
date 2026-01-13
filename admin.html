@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin – Edit Menu</title>
+  <style>
+    body{font-family:Arial,sans-serif;background:#faf7f2;padding:20px}
+    .wrap{max-width:900px;margin:auto;background:#fff;border-radius:10px;padding:20px}
+    h1{margin:0 0 10px}
+    fieldset{border:1px solid #ddd;border-radius:8px;margin:12px 0;padding:12px}
+    legend{font-weight:bold}
+    label{display:block;margin:8px 0}
+    input,textarea{width:100%;padding:10px;margin-top:6px}
+    .row{display:flex;gap:12px;flex-wrap:wrap}
+    .row > div{flex:1;min-width:240px}
+    table{width:100%;border-collapse:collapse;margin-top:8px}
+    th,td{border-bottom:1px solid #eee;padding:8px;text-align:left}
+    td input{width:100%;padding:8px}
+    button{padding:10px 14px;border:0;border-radius:8px;cursor:pointer}
+    .btn-primary{background:#7a3e00;color:#fff}
+    .btn-secondary{background:#eee}
+    .btn-danger{background:#b00020;color:#fff}
+    .hint{color:#555;font-size:13px}
+    .status{margin-top:12px;padding:10px;border-radius:8px}
+    .ok{background:#e7f7ee;color:#0b5}
+    .err{background:#ffe8e8;color:#b00}
+    code{background:#f3f3f3;padding:2px 6px;border-radius:6px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Admin – Edit Menu</h1>
+    <div class="hint">
+      This updates <code>menu.json</code> in your GitHub repo using the GitHub Contents API.
+      Keep this page link private.
+    </div>
+
+    <fieldset>
+      <legend>GitHub Repo Details</legend>
+      <div class="row">
+        <div>
+          <label>Owner (username or org)
+            <input id="owner" placeholder="e.g., sanatanmandiratlanta" />
+          </label>
+        </div>
+        <div>
+          <label>Repo name
+            <input id="repo" placeholder="e.g., tiffin-order-form" />
+          </label>
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <label>Branch (usually main)
+            <input id="branch" value="main" />
+          </label>
+        </div>
+        <div>
+          <label>Menu file path
+            <input id="path" value="menu.json" />
+          </label>
+        </div>
+      </div>
+
+      <label>GitHub Token (fine-grained, Contents: read/write)
+        <input id="token" type="password" placeholder="Paste token here (not stored permanently)" />
+      </label>
+
+      <div class="row">
+        <div><button class="btn-secondary" id="btnLoad">Load Current menu.json</button></div>
+        <div><button class="btn-secondary" id="btnRemember">Remember repo fields (local only)</button></div>
+      </div>
+      <div class="hint">Token is kept only in <b>this tab session</b> (sessionStorage). Repo fields can be remembered in your browser (localStorage).</div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Days</legend>
+      <label>Enter days separated by commas
+        <input id="days" placeholder="Monday, Tuesday, Wednesday, ..." />
+      </label>
+    </fieldset>
+
+    <fieldset>
+      <legend>Items</legend>
+      <div class="hint">Add/remove items. Prices must be numbers.</div>
+      <table id="itemsTable">
+        <thead>
+          <tr>
+            <th style="width:55%">Item name</th>
+            <th style="width:25%">Price</th>
+            <th style="width:20%">Action</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <div style="margin-top:10px">
+        <button class="btn-secondary" id="btnAddItem">+ Add Item</button>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Payment Note</legend>
+      <label>Note shown on order form / included in emails
+        <input id="note" value="To be paid at temple during pick up" />
+      </label>
+    </fieldset>
+
+    <div class="row">
+      <div><button class="btn-primary" id="btnSave">Save to GitHub (update menu.json)</button></div>
+      <div><button class="btn-secondary" id="btnPreview">Preview JSON</button></div>
+      <div><button class="btn-danger" id="btnClearToken">Clear Token</button></div>
+    </div>
+
+    <div id="status" class="status" style="display:none"></div>
+    <pre id="preview" style="display:none; background:#111; color:#eee; padding:12px; border-radius:10px; overflow:auto;"></pre>
+  </div>
+
+<script>
+  // ===== Utilities =====
+  const $ = (id) => document.getElementById(id);
+  const statusEl = $('status');
+  const previewEl = $('preview');
+  const itemsBody = document.querySelector('#itemsTable tbody');
+
+  function setStatus(msg, ok=true){
+    statusEl.style.display = 'block';
+    statusEl.className = 'status ' + (ok ? 'ok' : 'err');
+    statusEl.textContent = msg;
+  }
+  function clearStatus(){ statusEl.style.display='none'; statusEl.textContent=''; }
+  function safeJsonParse(str){
+    try { return JSON.parse(str); } catch { return null; }
+  }
+
+  function getRepoConfig(){
+    const owner = $('owner').value.trim();
+    const repo = $('repo').value.trim();
+    const branch = $('branch').value.trim() || 'main';
+    const path = $('path').value.trim() || 'menu.json';
+    const token = $('token').value.trim() || sessionStorage.getItem('gh_token') || '';
+    return { owner, repo, branch, path, token };
+  }
+
+  function rememberRepoFields(){
+    const cfg = getRepoConfig();
+    localStorage.setItem('menu_admin_owner', cfg.owner);
+    localStorage.setItem('menu_admin_repo', cfg.repo);
+    localStorage.setItem('menu_admin_branch', cfg.branch);
+    localStorage.setItem('menu_admin_path', cfg.path);
+    setStatus('Saved repo fields in this browser.', true);
+  }
+
+  function loadRememberedRepoFields(){
+    $('owner').value = localStorage.getItem('menu_admin_owner') || '';
+    $('repo').value  = localStorage.getItem('menu_admin_repo')  || '';
+    $('branch').value= localStorage.getItem('menu_admin_branch')|| 'main';
+    $('path').value  = localStorage.getItem('menu_admin_path')  || 'menu.json';
+    const t = sessionStorage.getItem('gh_token');
+    if (t) $('token').value = t;
+  }
+
+  function addItemRow(name='', price=''){
+    const tr = document.createElement('tr');
+
+    const tdName = document.createElement('td');
+    const nameInput = document.createElement('input');
+    nameInput.value = name;
+    nameInput.placeholder = 'e.g., Dal';
+    tdName.appendChild(nameInput);
+
+    const tdPrice = document.createElement('td');
+    const priceInput = document.createElement('input');
+    priceInput.value = price;
+    priceInput.placeholder = 'e.g., 6';
+    priceInput.inputMode = 'decimal';
+    tdPrice.appendChild(priceInput);
+
+    const tdAct = document.createElement('td');
+    const btn = document.createElement('button');
+    btn.className = 'btn-danger';
+    btn.type = 'button';
+    btn.textContent = 'Remove';
+    btn.onclick = () => tr.remove();
+    tdAct.appendChild(btn);
+
+    tr.appendChild(tdName);
+    tr.appendChild(tdPrice);
+    tr.appendChild(tdAct);
+    itemsBody.appendChild(tr);
+  }
+
+  function readItemsFromTable(){
+    const items = [];
+    [...itemsBody.querySelectorAll('tr')].forEach(tr => {
+      const inputs = tr.querySelectorAll('input');
+      const name = (inputs[0].value || '').trim();
+      const priceStr = (inputs[1].value || '').trim();
+      if (!name && !priceStr) return;
+      const price = Number(priceStr);
+      items.push({ name, price });
+    });
+    return items;
+  }
+
+  function buildMenuObject(){
+    const daysRaw = $('days').value.trim();
+    const days = daysRaw ? daysRaw.split(',').map(s => s.trim()).filter(Boolean) : [];
+    const items = readItemsFromTable();
+    const note = $('note').value.trim();
+
+    return { days, items, note };
+  }
+
+  function validateMenu(menu){
+    if (!Array.isArray(menu.days) || menu.days.length === 0) return 'Please enter at least one day.';
+    if (!Array.isArray(menu.items) || menu.items.length === 0) return 'Please add at least one item.';
+    for (const it of menu.items){
+      if (!it.name) return 'Each item must have a name.';
+      if (typeof it.price !== 'number' || Number.isNaN(it.price)) return `Price must be a number for: ${it.name}`;
+      if (it.price < 0) return `Price cannot be negative for: ${it.name}`;
+    }
+    return null;
+  }
+
+  // ===== GitHub API calls =====
+  async function ghGetFile({owner, repo, branch, path, token}){
+    const url = `https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/contents/${encodeURIComponent(path)}?ref=${encodeURIComponent(branch)}`;
+    const res = await fetch(url, {
+      headers: {
+        'Accept': 'application/vnd.github+json',
+        ...(token ? {'Authorization': `Bearer ${token}`} : {})
+      }
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data?.message || 'GitHub GET failed');
+    return data; // includes content (base64) and sha
+  }
+
+  async function ghPutFile({owner, repo, branch, path, token, contentBase64, sha, message}){
+    const url = `https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/contents/${encodeURIComponent(path)}`;
+    const res = await fetch(url, {
+      method: 'PUT',
+      headers: {
+        'Accept': 'application/vnd.github+json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        message,
+        content: contentBase64,
+        sha,
+        branch
+      })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data?.message || 'GitHub PUT failed');
+    return data;
+  }
+
+  function b64EncodeUnicode(str){
+    // Proper base64 for UTF-8
+    return btoa(unescape(encodeURIComponent(str)));
+  }
+  function b64DecodeUnicode(b64){
+    return decodeURIComponent(escape(atob(b64)));
+  }
+
+  // ===== Button handlers =====
+  $('btnAddItem').onclick = () => addItemRow('', '');
+  $('btnRemember').onclick = () => rememberRepoFields();
+  $('btnClearToken').onclick = () => {
+    $('token').value = '';
+    sessionStorage.removeItem('gh_token');
+    setStatus('Token cleared for this tab.', true);
+  };
+
+  $('btnPreview').onclick = () => {
+    clearStatus();
+    const menu = buildMenuObject();
+    const err = validateMenu(menu);
+    if (err) return setStatus(err, false);
+    previewEl.style.display = 'block';
+    previewEl.textContent = JSON.stringify(menu, null, 2);
+    setStatus('Preview updated below.', true);
+  };
+
+  $('btnLoad').onclick = async () => {
+    clearStatus();
+    previewEl.style.display = 'none';
+    const cfg = getRepoConfig();
+
+    if (!cfg.owner || !cfg.repo) return setStatus('Please enter Owner and Repo name.', false);
+
+    // Store token only in-session (not permanent)
+    if ($('token').value.trim()) sessionStorage.setItem('gh_token', $('token').value.trim());
+
+    try{
+      const file = await ghGetFile(cfg);
+      const decoded = b64DecodeUnicode(file.content.replace(/\n/g,''));
+      const menu = safeJsonParse(decoded);
+      if (!menu) throw new Error('menu.json is not valid JSON.');
+
+      // Fill UI
+      $('days').value = (menu.days || []).join(', ');
+      $('note').value = menu.note || '';
+
+      itemsBody.innerHTML = '';
+      (menu.items || []).forEach(it => addItemRow(it.name || '', it.price ?? ''));
+
+      // Keep sha in memory for saves
+      window.__MENU_SHA__ = file.sha;
+
+      setStatus('Loaded menu.json from GitHub.', true);
+    } catch(e){
+      setStatus('Load failed: ' + e.message, false);
+    }
+  };
+
+  $('btnSave').onclick = async () => {
+    clearStatus();
+    previewEl.style.display = 'none';
+
+    const cfg = getRepoConfig();
+    if (!cfg.owner || !cfg.repo) return setStatus('Please enter Owner and Repo name.', false);
+    if (!cfg.token) return setStatus('Please paste your GitHub token (fine-grained).', false);
+
+    // Store token only in-session
+    sessionStorage.setItem('gh_token', cfg.token);
+
+    const menu = buildMenuObject();
+    const err = validateMenu(menu);
+    if (err) return setStatus(err, false);
+
+    try{
+      // Ensure we have latest SHA (avoid overwriting someone else’s change)
+      let sha = window.__MENU_SHA__;
+      if (!sha){
+        const file = await ghGetFile(cfg);
+        sha = file.sha;
+        window.__MENU_SHA__ = sha;
+      }
+
+      const jsonStr = JSON.stringify(menu, null, 2);
+      const contentB64 = b64EncodeUnicode(jsonStr);
+
+      await ghPutFile({
+        ...cfg,
+        token: cfg.token,
+        contentBase64: contentB64,
+        sha,
+        message: `Update menu.json via admin (${new Date().toISOString()})`
+      });
+
+      setStatus('Saved! menu.json updated in GitHub. Refresh the order form to see changes.', true);
+    } catch(e){
+      setStatus('Save failed: ' + e.message, false);
+    }
+  };
+
+  // Init
+  loadRememberedRepoFields();
+  // Put one starter row so UI isn't empty
+  if (itemsBody.children.length === 0) addItemRow('Dal', '6');
+</script>
+</body>
+</html>
